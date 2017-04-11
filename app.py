@@ -15,7 +15,9 @@ app = Flask(__name__)
 @app.route('/webhook', methods=['POST'])
 def webhook():
     req = request.get_json(silent=True, force=True)
-
+	if 0 == len(Context):	
+		Context = list()
+	
     print("Request:")
     print(json.dumps(req, indent=4))
 
@@ -28,35 +30,33 @@ def webhook():
     return r
 
 def makeWebhookResult(req):
-    if req.get("result").get("action") != "costo.risorsa":
-        return {
-            "speech": "no action",
-            "displayText": "no action",
-            "source": "apiai-onlinestore-shipping"
-        }
-    result = req.get("result")
-    parameters = result.get("parameters")
-    #zone = parameters.get("shipping-zone")
-    esperienza = parameters.get("esperienza_fra")
-    provenienza = parameters.get("provenienza_fra")
-    risorsa = provenienza + " " + esperienza
+	if req.get("result").get("action") == "costo.risorsa":
+		result = req.get("result")
+		parameters = result.get("parameters")
+		#zone = parameters.get("shipping-zone")
+		esperienza = parameters.get("esperienza_fra")
+		provenienza = parameters.get("provenienza_fra")
+		risorsa = provenienza + " " + esperienza
 
-    #cost = {'Europe':100, 'North America':200, 'South America':300, 'Asia':400, 'Africa':500}
-    cost = {'interna junior':150, 'interna senior':250, 'esterna junior':180, 'esterna senior':210}
+		#cost = {'Europe':100, 'North America':200, 'South America':300, 'Asia':400, 'Africa':500}
+		cost = {'interna junior':150, 'interna senior':250, 'esterna junior':180, 'esterna senior':210}
 
-    #speech = "The cost of shipping to " + zone + " is " + str(cost[zone]) + " euros."
-    speech = "Il costo di una risorsa " + risorsa + " is " + str(cost[risorsa]) + " euro."
+		#speech = "The cost of shipping to " + zone + " is " + str(cost[zone]) + " euros."
+		speech = "Il costo di una risorsa " + risorsa + " is " + str(cost[risorsa]) + " euro."
+		req.get("result")
+		print("Response:")
+		print(speech)
 
-    print("Response:")
-    print(speech)
-
-    return {
-        "speech": speech,
-        "displayText": speech,
-        #"data": {},
-        # "contextOut": [],
-        "source": "apiai-onlinestore-shipping"
-    }
+		return {
+			"speech": speech,
+			"displayText": speech,
+			#"data": {},
+			# "contextOut": [],
+			"source": "apiai-onlinestore-shipping"
+		}
+		
+	
+    
 
 
 if __name__ == '__main__':
